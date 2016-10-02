@@ -8,16 +8,19 @@
 
 UART_HandleTypeDef UART3_Handle;
 ADC_HandleTypeDef ADC_HandleStruct;
+TIM_HandleTypeDef TIM2_Handle;
 
 uint8_t dato;
 
 extern void APP_GetData(uint8_t dato);
+extern void APP_1ms(void);
 
 void BSP_Init(void) {
 	BSP_RCC_Init();
 	BSP_UART_Init();
 	BSP_SW_Init();
 	BSP_ADC_Init();
+	TIM2_CLK_Init();
 }
 
 void BSP_RCC_Init(void) {
@@ -113,6 +116,28 @@ uint32_t BSP_SW_GetState(SW_TypeDef sw){
 	return HAL_GPIO_ReadPin(SW_PORT, SW_PIN[sw]);
 }
 
+
+void TIM2_CLK_Init(void){
+	__TIM2_CLK_ENABLE()
+			;
+
+			TIM2_Handle.Instance = TIM2;
+			TIM2_Handle.Init.Period = 1000 - 1;
+			TIM2_Handle.Init.Prescaler = 84 - 1;
+			TIM2_Handle.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
+			TIM2_Handle.Init.CounterMode = TIM_COUNTERMODE_UP;
+
+			HAL_TIM_Base_Init(&TIM2_Handle);
+			HAL_TIM_Base_Start_IT(&TIM2_Handle);
+
+			HAL_NVIC_SetPriority(TIM2_IRQn, 0, 2);
+			HAL_NVIC_EnableIRQ(TIM2_IRQn);
+
+
+
+}
+
+
 void BSP_ADC_Init(void){
 	ADC_ChannelConfTypeDef ChannelConfStruct;
 		GPIO_InitTypeDef GPIO_InitStruct;
@@ -159,4 +184,11 @@ void BSP_ADC_Init(void){
 uint16_t BSP_ADC_GetValue(void){
 	HAL_ADC_Start(&ADC_HandleStruct);
 		return HAL_ADC_GetValue(&ADC_HandleStruct);
+}
+
+void TIM2_IRQHandler(void) {
+
+	__HAL_TIM_CLEAR_FLAG(&TIM2_Handle, TIM_FLAG_UPDATE);
+	APP_1ms();
+
 }
