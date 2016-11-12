@@ -45,7 +45,7 @@ int main(void) {
 				bloqueo = 0;
 				size =
 						sprintf(txBuffer,
-								"Menu inicial: \r\n 1 Obtener valor ADC \r\n 2 Leds \r\n3 Estado SW\r\n ");
+								"Menu inicial: \r\n 1 Obtener valor ADC \r\n 2 Leds \r\n 3 Estado SW\r\n ");
 				TransmitData(txBuffer, size);
 			}
 			if (tx) {
@@ -106,7 +106,6 @@ int main(void) {
 						size = sprintf(txBuffer, "ADC Binario:");
 						TransmitData(txBuffer, size);
 						get_Binario(Pote);
-
 					}
 					if (rxDato == '2') {
 						bloqueo = 1;
@@ -274,7 +273,17 @@ void APP_1ms() {
 }
 
 void get_Binario(uint16_t Potenciometro) {
-	uint16_t comp = 4096;
+	uint16_t comp = 2048;
+//	if (Potenciometro & 4048) {
+//		size = sprintf(txBuffer, "1");
+//		TransmitData(txBuffer, size);
+//
+//	} else {
+//		size = sprintf(txBuffer, "0");
+//		TransmitData(txBuffer, size);
+//
+//	}
+//	comp  /= 2;
 	for (int i = 12; i > 0; i--) {
 		if (Potenciometro & comp) {
 			size = sprintf(txBuffer, "1");
